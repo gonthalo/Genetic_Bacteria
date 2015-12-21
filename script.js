@@ -6,17 +6,20 @@ var mats = [];
 var maps = [];
 var indivs = [];
 var n_indivs = 10;
+var p_mutacion = 10;
 var color1 = [5, 255, 100];
 var color2 = [200, 10, 20];
 var color3 = [200, 5, 180];
 var pausa = false;
 var a = 10;
 var b = 10;
-var dens = 10;
+var dens = 8;
 var borde = 20;
 var gen = 0;
-var numbers;
+var numbers = [];
+var scores = [];
 var time = 0;
+var timeInterval = 300;
 
 // funciones generadoras de los principales objetos
 
@@ -40,6 +43,8 @@ function randAdn(){
 function resetbacteria(){
 	for (var hh=0; hh<n_indivs; hh++){
 		indivs[hh] = [randAdn(), randAdn()];
+		numbers[hh] = hh;
+		scores[hh] = [];
 	}
 }
 
@@ -69,6 +74,12 @@ function resetboards(){
 		mats[hh][a/2 - 1][b/2] = 3;
 		mats[hh][a/2 - 1][b/2 - 1] = 3;
 		mats[hh][a/2][b/2 - 1] = 3;
+		x0 = (2*dens*a + borde)*(hh%(n_indivs/2));
+		y0 = (2*dens*b + borde)*(parseInt(hh*2/n_indivs) + 1);
+		pluma.fillStyle = "white";
+		pluma.fillRect(x0, y0, 40, 20);
+		pluma.fillStyle = "black";
+		pluma.fillText(numbers[hh], borde + x0, borde + y0 - 5);
 	}
 }
 
@@ -133,23 +144,27 @@ function fulldraw(ind){
 	}
 }
 
-/*function draw(ind){
-	for (var ii=0; ii<a; ii++){
-		for (var jj=0; jj<b; jj++){
-			if (matrix[ii][jj] && !matsim[ii + 1][jj + 1]){
-				block(dens + dens*2*ii, dens + 2*dens*jj, dens, color);
-			}
-			if (!matrix[ii][jj] && matsim[ii + 1][jj + 1]){
-				pluma.fillStyle = "black";
-				pluma.fillRect(2*dens*ii, 2*dens*jj, 2*dens, 2*dens);
-			}
-		}
-	}
-}*/
-
 function draw(){
 	for (var ii=0; ii<n_indivs; ii++){
 		fulldraw(ii);
+	}
+}
+
+function drawAdn(ind){
+	var y0 = 3*borde + dens + 2*dens*b*2;
+	pluma.fillStyle = "black";
+	for (var hh=0; hh<2; hh++){
+		for (var ii=0; ii<4; ii++){
+			for (var jj=0; jj<4; jj++){
+				for (var kk=0; kk<4; kk++){
+					for (var ll=0; ll<4; ll++){
+						if (indivs[ind][hh][ii][jj][kk][ll]){
+							pluma.fillRect(40*hh + 4*ii + jj, y0 + 4*kk + ll, 1, 1);
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -267,6 +282,9 @@ function mezclar(i1, i2){
 					} else {
 						adn[ii][jj][kk][ll] = i2[ii][jj][kk][ll];
 					}
+					if (Math.random()*p_mutacion<1){
+						adn[ii][jj][kk][ll] = !adn[ii][jj][kk][ll];
+					}
 				}
 			}
 		}
@@ -289,21 +307,31 @@ function contar(ind){
 }
 
 function evalua(){
-	lis = [];
+	var lis = [];
 	for (var hh=0; hh<n_indivs; hh++){
+		scores[hh][scores[hh].length] = contar(hh);
 		lis[hh] = contar(hh);
 	}
 	return lis;
 }
 
+function media(lista){
+	var tot = 0;
+	for (var ind=0; ind<lista.length; ind++){
+		tot = tot + lista[ind];
+	}
+	return (tot + 0.0)/lista.length;
+}
+
 function evolution(){
 	var lis = evalua();
-	var tot = 0;
+	console.log(lis, media(lis));
 	for (var hh=0; hh<n_indivs; hh++){
-		tot = tot + lis[hh];
+		lis[hh] = media(scores[hh]) + Math.log(scores[hh].length);
 	}
-	console.log(lis, (tot + 0.0)/n_indivs);
 	indices = [];
+	nums = [];
+	new_scores = [];
 	for (var tt=0; tt<n_indivs/2; tt++){
 		var max = 0;
 		var pos = 0;
@@ -312,6 +340,10 @@ function evolution(){
 				max = lis[ii];
 				pos = ii;
 			}
+		}
+		new_scores[tt] = [];
+		for (var hh=0; hh<scores[pos].length; hh++){
+			new_scores[tt][hh] = scores[pos][hh];
 		}
 		indices[tt] = [];
 		for (var hh=0; hh<2; hh++){
@@ -329,19 +361,21 @@ function evolution(){
 				}
 			}
 		}
+		nums[tt] = numbers[pos];
 		lis[pos] = -1;
 	}
 	for (var tt=0; tt<n_indivs/2; tt++){
+		numbers[tt] = nums[tt];
+		scores[tt] = [];
+		for (var hh=0; hh<new_scores[tt].length; hh++){
+			scores[tt][hh] = new_scores[tt][hh];
+		}
 		for (var hh=0; hh<2; hh++){
-			indivs[2*tt][hh] = [];
 			for (var ii=0; ii<4; ii++){
-				indivs[2*tt][hh][ii] = [];
 				for (var jj=0; jj<4; jj++){
-					indivs[2*tt][hh][ii][jj] = [];
 					for (var kk=0; kk<4; kk++){
-						indivs[2*tt][hh][ii][jj][kk] = [];
 						for (var ll=0; ll<4; ll++){
-							indivs[2*tt][hh][ii][jj][kk][ll] = indivs[pos];
+							indivs[tt][hh][ii][jj][kk][ll] = indivs[pos];
 						}
 					}
 				}
@@ -349,15 +383,18 @@ function evolution(){
 		}
 	}
 	for (var tt=0; tt<n_indivs/2; tt++){
-		indivs[2*tt + 1] = [mezclar(indices[tt][0], indices[(tt + 1)%(n_indivs/2)][0]), mezclar(indices[tt][1], indices[(tt + 1)%(n_indivs/2)][1])];
+		var aux = (tt + 1)%(n_indivs/2);
+		indivs[tt + n_indivs/2] = [mezclar(indices[tt][0], indices[aux][0]), mezclar(indices[tt][1], indices[aux][1])];
+		numbers[tt + n_indivs/2] = n_indivs/2*(gen + 1) + tt;
+		scores[tt + n_indivs/2] = [];
 	}
 }
 
 // funciones para ejecutar desde el html
 
 function comenzar(){
-	resetboards();
 	resetbacteria();
+	resetboards();
 }
 
 function revisar(){
@@ -365,12 +402,12 @@ function revisar(){
 		avanzar();
 		time++;
 		document.getElementById("messages").innerHTML = "Tiempo: " + time + ".    Generacion: " + gen;
-		if (time == 250){
+		if (time == timeInterval){
+			time = 0;
+			gen++;
 			evolution();
 			resetboards();
 			draw();
-			gen++;
-			time = 0;
 		}
 	}
 }
