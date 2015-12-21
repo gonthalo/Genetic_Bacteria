@@ -19,6 +19,7 @@ var gen = 0;
 var numbers = [];
 var scores = [];
 var time = 0;
+var sims = 0;
 var timeInterval = 300;
 
 // funciones generadoras de los principales objetos
@@ -307,6 +308,9 @@ function cortar(i1, i2){
 					} else {
 						adn[ii][jj][kk][ll] = i2[ii][jj][kk][ll];
 					}
+					if (Math.random()*p_mutacion<1){
+						adn[ii][jj][kk][ll] = !adn[ii][jj][kk][ll];
+					}
 				}
 			}
 		}
@@ -375,7 +379,7 @@ function evolution(){
 					for (var kk=0; kk<4; kk++){
 						indices[tt][hh][ii][jj][kk] = [];
 						for (var ll=0; ll<4; ll++){
-							indices[tt][hh][ii][jj][kk][ll] = indivs[pos];
+							indices[tt][hh][ii][jj][kk][ll] = indivs[pos][hh][ii][jj][kk][ll];
 						}
 					}
 				}
@@ -410,6 +414,17 @@ function evolution(){
 	}
 }
 
+function opti(ind){
+	for (var jj=0; jj<4; jj++){
+		for (var kk=0; kk<4; kk++){
+			for (var ll=0; ll<4; ll++){
+				indivs[ind][0][2][jj][kk][ll] = false;
+				indivs[ind][1][1][jj][kk][ll] = true;
+			}
+		}
+	}
+}
+
 // funciones para ejecutar desde el html
 
 function comenzar(){
@@ -422,7 +437,16 @@ function revisar(){
 		avanzar();
 		time++;
 		document.getElementById("messages").innerHTML = "Tiempo: " + time + ".    Generacion: " + gen;
-		if (time == timeInterval){
+		if (time%timeInterval==0){
+			sims++;
+			if (time/timeInterval!=3){
+				evalua();
+				resetboards();
+				draw();
+			}
+		}
+		if (sims == 3){
+			sims = 0;
 			time = 0;
 			gen++;
 			evolution();
