@@ -15,6 +15,8 @@ var b = 10;
 var dens = 10;
 var borde = 20;
 var gen = 0;
+var numbers;
+var time = 0;
 
 // funciones generadoras de los principales objetos
 
@@ -295,8 +297,12 @@ function evalua(){
 }
 
 function evolution(){
-	lis = evalua();
-	console.log(lis);
+	var lis = evalua();
+	var tot = 0;
+	for (var hh=0; hh<n_indivs; hh++){
+		tot = tot + lis[hh];
+	}
+	console.log(lis, (tot + 0.0)/n_indivs);
 	indices = [];
 	for (var tt=0; tt<n_indivs/2; tt++){
 		var max = 0;
@@ -357,13 +363,14 @@ function comenzar(){
 function revisar(){
 	if (!pausa){
 		avanzar();
-		gen++;
-		document.getElementById("messages").innerHTML = "Generation: " + gen;
-		if (gen == 200){
+		time++;
+		document.getElementById("messages").innerHTML = "Tiempo: " + time + ".    Generacion: " + gen;
+		if (time == 250){
 			evolution();
 			resetboards();
 			draw();
-			gen = 0;
+			gen++;
+			time = 0;
 		}
 	}
 }
@@ -371,4 +378,4 @@ function revisar(){
 
 comenzar();
 
-window.setInterval(revisar, 100);
+window.setInterval(revisar, 10);
