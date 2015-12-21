@@ -79,6 +79,7 @@ function resetboards(){
 		y0 = (2*dens*b + borde)*(parseInt(hh*2/n_indivs) + 1);
 		pluma.fillStyle = "white";
 		pluma.fillRect(x0, y0, 60, 30);
+		drawAdn(hh, x0 + 70, y0 + 2);
 		pluma.fillStyle = "black";
 		pluma.fillText(numbers[hh], borde + x0, borde + y0 - 5);
 	}
@@ -151,8 +152,9 @@ function draw(){
 	}
 }
 
-function drawAdn(ind){
-	var y0 = 3*borde + dens + 2*dens*b*2;
+function drawAdn(ind, x0, y0){
+	pluma.fillStyle = "white";
+	pluma.fillRect(x0, y0, 32, 16);
 	pluma.fillStyle = "black";
 	for (var hh=0; hh<2; hh++){
 		for (var ii=0; ii<4; ii++){
@@ -160,7 +162,7 @@ function drawAdn(ind){
 				for (var kk=0; kk<4; kk++){
 					for (var ll=0; ll<4; ll++){
 						if (indivs[ind][hh][ii][jj][kk][ll]){
-							pluma.fillRect(40*hh + 4*ii + jj, y0 + 4*kk + ll, 1, 1);
+							pluma.fillRect(x0 + 20*hh + 4*ii + jj, y0 + 4*kk + ll, 1, 1);
 						}
 					}
 				}
