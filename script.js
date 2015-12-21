@@ -77,7 +77,7 @@ function resetboards(){
 		x0 = (2*dens*a + borde)*(hh%(n_indivs/2));
 		y0 = (2*dens*b + borde)*(parseInt(hh*2/n_indivs) + 1);
 		pluma.fillStyle = "white";
-		pluma.fillRect(x0, y0, 40, 20);
+		pluma.fillRect(x0, y0, 60, 30);
 		pluma.fillStyle = "black";
 		pluma.fillText(numbers[hh], borde + x0, borde + y0 - 5);
 	}
@@ -292,7 +292,27 @@ function mezclar(i1, i2){
 	return adn;
 }
 
-function cortar(i1, i2){}
+function cortar(i1, i2){
+	rand1 = parseInt(Math.random()*256);
+	var adn = [];
+	for (var ii=0; ii<4; ii++){
+		adn[ii]=[];
+		for (var jj=0; jj<4; jj++){
+			adn[ii][jj]=[];
+			for (var kk=0; kk<4; kk++){
+				adn[ii][jj][kk]=[];
+				for (var ll=0; ll<4; ll++){
+					if (64*ii + 16*jj + 4*kk + ll >rand1){
+						adn[ii][jj][kk][ll] = i1[ii][jj][kk][ll];
+					} else {
+						adn[ii][jj][kk][ll] = i2[ii][jj][kk][ll];
+					}
+				}
+			}
+		}
+	}
+	return adn;
+}
 
 function contar(ind){
 	var res = 0;
@@ -327,7 +347,7 @@ function evolution(){
 	var lis = evalua();
 	console.log(lis, media(lis));
 	for (var hh=0; hh<n_indivs; hh++){
-		lis[hh] = media(scores[hh]) + Math.log(scores[hh].length);
+		lis[hh] = media(scores[hh])// + Math.log(scores[hh].length);
 	}
 	indices = [];
 	nums = [];
@@ -375,7 +395,7 @@ function evolution(){
 				for (var jj=0; jj<4; jj++){
 					for (var kk=0; kk<4; kk++){
 						for (var ll=0; ll<4; ll++){
-							indivs[tt][hh][ii][jj][kk][ll] = indivs[pos];
+							indivs[tt][hh][ii][jj][kk][ll] = indices[tt][hh][ii][jj][kk][ll];
 						}
 					}
 				}
